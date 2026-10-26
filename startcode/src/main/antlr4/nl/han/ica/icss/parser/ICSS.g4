@@ -45,5 +45,25 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 //--- PARSER: ---
-stylesheet: EOF;
+stylesheet: stylerule* EOF;
+
+stylerule: selector OPEN_BRACE declaration* CLOSE_BRACE;
+
+selector: LOWER_IDENT #tagSelector
+        | ID_IDENT #idSelector
+        | CLASS_IDENT #classSelector
+        ;
+
+declaration: propertyName COLON expression SEMICOLON;
+
+propertyName: LOWER_IDENT;
+
+expression: literal;
+
+literal: COLOR #colorLiteral
+       | PIXELSIZE #pixelLiteral
+       | PERCENTAGE #percentageLiteral
+       | SCALAR #scalarLiteral
+       | (TRUE | FALSE) #boolLiteral
+       ;
 

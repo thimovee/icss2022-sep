@@ -3,6 +3,7 @@ package nl.han.ica.icss.parser;
 import java.util.Stack;
 
 
+import nl.han.ica.datastructures.HANStack;
 import nl.han.ica.datastructures.IHANStack;
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
@@ -17,7 +18,7 @@ import nl.han.ica.icss.ast.selectors.TagSelector;
  * This class extracts the ICSS Abstract Syntax Tree from the Antlr Parse tree.
  */
 public class ASTListener extends ICSSBaseListener {
-	
+
 	//Accumulator attributes:
 	private AST ast;
 
@@ -26,10 +27,88 @@ public class ASTListener extends ICSSBaseListener {
 
 	public ASTListener() {
 		ast = new AST();
-		//currentContainer = new HANStack<>();
+		currentContainer = new HANStack<>();
 	}
     public AST getAST() {
         return ast;
     }
-    
+
+	@Override
+	public void enterStylesheet(ICSSParser.StylesheetContext ctx) {
+		currentContainer.push(new Stylesheet());
+	}
+
+	@Override
+	public void exitStylesheet(ICSSParser.StylesheetContext ctx) {
+		ast.setRoot((Stylesheet) currentContainer.pop());
+	}
+
+	@Override
+	public void enterStylerule(ICSSParser.StyleruleContext ctx) {
+		currentContainer.push(new Stylerule());
+	}
+
+	@Override
+	public void exitStylerule(ICSSParser.StyleruleContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void exitTagSelector(ICSSParser.TagSelectorContext ctx) {
+		addToParent(new TagSelector(ctx.getText()));
+	}
+
+	@Override
+	public void exitIdSelector(ICSSParser.IdSelectorContext ctx) {
+		addToParent(new IdSelector(ctx.getText()));
+	}
+
+	@Override
+	public void exitClassSelector(ICSSParser.ClassSelectorContext ctx) {
+		addToParent(new ClassSelector(ctx.getText()));
+	}
+
+	@Override
+	public void enterDeclaration(ICSSParser.DeclarationContext ctx) {
+		currentContainer.push(new Declaration());
+	}
+
+	@Override
+	public void exitDeclaration(ICSSParser.DeclarationContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void exitPropertyName(ICSSParser.PropertyNameContext ctx) {
+		addToParent(new PropertyName(ctx.getText()));
+	}
+
+	@Override
+	public void exitColorLiteral(ICSSParser.ColorLiteralContext ctx) {
+		addToParent(new ColorLiteral(ctx.getText()));
+	}
+
+	@Override
+	public void exitPixelLiteral(ICSSParser.PixelLiteralContext ctx) {
+		addToParent(new PixelLiteral(ctx.getText()));
+	}
+
+	@Override
+	public void exitPercentageLiteral(ICSSParser.PercentageLiteralContext ctx) {
+		addToParent(new PercentageLiteral(ctx.getText()));
+	}
+
+	@Override
+	public void exitScalarLiteral(ICSSParser.ScalarLiteralContext ctx) {
+		addToParent(new ScalarLiteral(ctx.getText()));
+	}
+
+	@Override
+	public void exitBoolLiteral(ICSSParser.BoolLiteralContext ctx) {
+		addToParent(new BoolLiteral(ctx.getText()));
+	}
+
+	private void addToParent(ASTNode node) {
+		currentContainer.peek().addChild(node);
+	}
 }
