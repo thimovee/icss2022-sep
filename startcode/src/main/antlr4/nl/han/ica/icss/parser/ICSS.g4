@@ -45,9 +45,19 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 //--- PARSER: ---
-stylesheet: stylerule* EOF;
+stylesheet: (variableAssignment | stylerule)* EOF;
 
-stylerule: selector OPEN_BRACE declaration* CLOSE_BRACE;
+stylerule: selector OPEN_BRACE ruleBody CLOSE_BRACE;
+
+ruleBody: (declaration | variableAssignment | ifClause)*;
+
+ifClause: IF BOX_BRACKET_OPEN expression BOX_BRACKET_CLOSE OPEN_BRACE ruleBody CLOSE_BRACE elseClause?;
+
+elseClause: ELSE OPEN_BRACE ruleBody CLOSE_BRACE;
+
+variableAssignment: variableReference ASSIGNMENT_OPERATOR expression SEMICOLON;
+
+variableReference: CAPITAL_IDENT;
 
 selector: LOWER_IDENT #tagSelector
         | ID_IDENT #idSelector
@@ -58,7 +68,11 @@ declaration: propertyName COLON expression SEMICOLON;
 
 propertyName: LOWER_IDENT;
 
-expression: literal;
+expression: expression MUL expression #multiplyOperation
+          | expression operator=(PLUS | MIN) expression #additiveOperation
+          | variableReference #variableExpression
+          | literal #literalExpression
+          ;
 
 literal: COLOR #colorLiteral
        | PIXELSIZE #pixelLiteral

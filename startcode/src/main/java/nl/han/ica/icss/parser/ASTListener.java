@@ -84,6 +84,65 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
+	public void enterVariableAssignment(ICSSParser.VariableAssignmentContext ctx) {
+		currentContainer.push(new VariableAssignment());
+	}
+
+	@Override
+	public void exitVariableAssignment(ICSSParser.VariableAssignmentContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void exitVariableReference(ICSSParser.VariableReferenceContext ctx) {
+		addToParent(new VariableReference(ctx.getText()));
+	}
+
+	@Override
+	public void enterIfClause(ICSSParser.IfClauseContext ctx) {
+		currentContainer.push(new IfClause());
+	}
+
+	@Override
+	public void exitIfClause(ICSSParser.IfClauseContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void enterElseClause(ICSSParser.ElseClauseContext ctx) {
+		currentContainer.push(new ElseClause());
+	}
+
+	@Override
+	public void exitElseClause(ICSSParser.ElseClauseContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void enterMultiplyOperation(ICSSParser.MultiplyOperationContext ctx) {
+		currentContainer.push(new MultiplyOperation());
+	}
+
+	@Override
+	public void exitMultiplyOperation(ICSSParser.MultiplyOperationContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
+	public void enterAdditiveOperation(ICSSParser.AdditiveOperationContext ctx) {
+		if (ctx.operator.getType() == ICSSParser.PLUS) {
+			currentContainer.push(new AddOperation());
+		} else {
+			currentContainer.push(new SubtractOperation());
+		}
+	}
+
+	@Override
+	public void exitAdditiveOperation(ICSSParser.AdditiveOperationContext ctx) {
+		addToParent(currentContainer.pop());
+	}
+
+	@Override
 	public void exitColorLiteral(ICSSParser.ColorLiteralContext ctx) {
 		addToParent(new ColorLiteral(ctx.getText()));
 	}
