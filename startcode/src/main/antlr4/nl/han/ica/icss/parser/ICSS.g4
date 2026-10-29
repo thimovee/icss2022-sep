@@ -49,6 +49,7 @@ stylesheet: (variableAssignment | stylerule)* EOF;
 
 stylerule: selector OPEN_BRACE ruleBody CLOSE_BRACE;
 
+//--- gedeelde body van stylerule, if en else, zo kan een if alleen binnen een rule staan ---
 ruleBody: (declaration | variableAssignment | ifClause)*;
 
 ifClause: IF BOX_BRACKET_OPEN expression BOX_BRACKET_CLOSE OPEN_BRACE ruleBody CLOSE_BRACE elseClause?;
@@ -58,16 +59,17 @@ elseClause: ELSE OPEN_BRACE ruleBody CLOSE_BRACE;
 variableAssignment: variableReference ASSIGNMENT_OPERATOR expression SEMICOLON;
 
 variableReference: CAPITAL_IDENT;
-
+//--- selectors tags, elementen en klasses ---
 selector: LOWER_IDENT #tagSelector
         | ID_IDENT #idSelector
         | CLASS_IDENT #classSelector
         ;
-
+//--- css declaratie background: red; of iets anders  ---
 declaration: propertyName COLON expression SEMICOLON;
 
 propertyName: LOWER_IDENT;
 
+//--- bovenste alternatief gaat voor: * voor + en -, + en - samen zodat ze van links naar rechts gaan ---
 expression: expression MUL expression #multiplyOperation
           | expression operator=(PLUS | MIN) expression #additiveOperation
           | variableReference #variableExpression

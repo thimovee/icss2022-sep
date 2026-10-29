@@ -2,6 +2,7 @@ package nl.han.ica.datastructures;
 
 public class HANLinkedList<T> implements IHANLinkedList<T> {
 
+    // lege header node voor de eerste echte node, zo heeft elke node een voorganger 
     private final Node<T> header = new Node<>(null, null);
     private int size = 0;
 
@@ -19,6 +20,7 @@ public class HANLinkedList<T> implements IHANLinkedList<T> {
 
     @Override
     public void insert(int index, T value) {
+        // index gelijk aan size mag wel, dan wordt er achteraan toegevoegd 
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException(index);
         }
@@ -31,6 +33,7 @@ public class HANLinkedList<T> implements IHANLinkedList<T> {
     public void delete(int pos) {
         checkPosition(pos);
         Node<T> previous = nodeBefore(pos);
+        // vorige slaat de te verwijderen node over
         previous.next = previous.next.next;
         size--;
     }
@@ -56,6 +59,7 @@ public class HANLinkedList<T> implements IHANLinkedList<T> {
         return size;
     }
 
+    // geeft de node voor positie index, bij index 0 is dat de header 
     private Node<T> nodeBefore(int index) {
         Node<T> current = header;
         for (int i = 0; i < index; i++) {

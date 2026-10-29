@@ -1,8 +1,5 @@
 package nl.han.ica.icss.parser;
 
-import java.util.Stack;
-
-
 import nl.han.ica.datastructures.HANStack;
 import nl.han.ica.datastructures.IHANStack;
 import nl.han.ica.icss.ast.*;
@@ -33,6 +30,7 @@ public class ASTListener extends ICSSBaseListener {
         return ast;
     }
 
+	// knopen met kinderen, bij enter op de stack, bij exit eraf
 	@Override
 	public void enterStylesheet(ICSSParser.StylesheetContext ctx) {
 		currentContainer.push(new Stylesheet());
@@ -40,6 +38,7 @@ public class ASTListener extends ICSSBaseListener {
 
 	@Override
 	public void exitStylesheet(ICSSParser.StylesheetContext ctx) {
+		// heeft geen parent
 		ast.setRoot((Stylesheet) currentContainer.pop());
 	}
 
@@ -53,6 +52,7 @@ public class ASTListener extends ICSSBaseListener {
 		addToParent(currentContainer.pop());
 	}
 
+	// heeft geen children, dus geen enter nodig
 	@Override
 	public void exitTagSelector(ICSSParser.TagSelectorContext ctx) {
 		addToParent(new TagSelector(ctx.getText()));
@@ -130,6 +130,7 @@ public class ASTListener extends ICSSBaseListener {
 
 	@Override
 	public void enterAdditiveOperation(ICSSParser.AdditiveOperationContext ctx) {
+		// maakt gebruikt van de parser om te checken of het plus of min is
 		if (ctx.operator.getType() == ICSSParser.PLUS) {
 			currentContainer.push(new AddOperation());
 		} else {

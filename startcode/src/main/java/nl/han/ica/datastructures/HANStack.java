@@ -2,12 +2,14 @@ package nl.han.ica.datastructures;
 
 import java.util.EmptyStackException;
 
+// stack als linked list, top is de laatst gepushte node, elke node wijst naar de node eronder 
 public class HANStack<T> implements IHANStack<T> {
 
     private Node<T> top;
 
     @Override
     public void push(T value) {
+        // nieuwe node wordt de top en wijst naar de oude top 
         top = new Node<>(value, top);
     }
 
